@@ -9,9 +9,9 @@ t_SHUTTER_TIME =50
 
 t_MAX = time.time()+t_SHUTTER_TIME	# Time needed by the Shutter to move END to END (second)
 
-t_UP ="06:50"      # time to move the shutter UP
+t_UP ="23:29"      # time to move the shutter UP
 
-t_DOWN ="21:28"		# time to move the shutter DOWN
+t_DOWN ="23:31"		# time to move the shutter DOWN
 
 # Identify which pin controls the relay for movement UP
 SHUTTER_PIN_UP = 17
@@ -27,38 +27,38 @@ def GPIOsetup():
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(SHUTTER_PIN_UP, GPIO.OUT)
     GPIO.setup(SHUTTER_PIN_DOWN, GPIO.OUT)
-    GPIO.output(SHUTTER_PIN_UP, 0)
-    GPIO.output(SHUTTER_PIN_DOWN, 0)
+    GPIO.output(SHUTTER_PIN_UP, 1)			# relay works with inverse logic 0=OFF ; 1=ON
+    GPIO.output(SHUTTER_PIN_DOWN, 1)			# relay works with inverse logic 0=OFF ; 1=ON
 
 def relayUP_ON():
-    GPIO.output(SHUTTER_PIN_UP, 1)                   # relay_UP enabled
+    GPIO.output(SHUTTER_PIN_UP, 0)                   # relay_UP enabled
     return()
 	
 def relayUP_OFF():
-    GPIO.output(SHUTTER_PIN_UP, 0) 					 # relay_UP disabled	
+    GPIO.output(SHUTTER_PIN_UP, 1) 					 # relay_UP disabled	
     print "relay UP turned OFF"
     return()	
 
 def relayDOWN_ON():
-    GPIO.output(SHUTTER_PIN_DOWN, 1) 				# relay_DOWN enabled
+    GPIO.output(SHUTTER_PIN_DOWN, 0) 				# relay_DOWN enabled
     return()
 
 def relayDOWN_OFF():
-	GPIO.output(SHUTTER_PIN_DOWN, 0) 				# relay_DOWN disabled
+	GPIO.output(SHUTTER_PIN_DOWN, 1) 				# relay_DOWN disabled
 	print "relay DOWN turned OFF"
 	return()
 
 def relayUP_Status():
-	GPIO.input(SHUTTER_PIN_DOWN, 0) 				# relay_DOWN disabled
+	GPIO.input(SHUTTER_PIN_DOWN, 32) 				# relay_DOWN disabled
 	return()
 	
 def relayDOWN_Status():
-	GPIO.output(SHUTTER_PIN_DOWN, 0) 				# relay_DOWN disabled
+	GPIO.output(SHUTTER_PIN_DOWN, 33) 				# relay_DOWN disabled
 	return()
 
 
 def UP():
-    while (time.time() <= t_MAX):
+#    while (time.time() <= t_MAX):
        print time.time()           #testing
        print t_MAX					#testing
        print "redony fel"
@@ -70,7 +70,7 @@ def UP():
        return()
 
 def DOWN():
-    while (time.time() <= t_MAX):
+#    while (time.time() <= t_MAX):
        print time.time()			#testing
        print t_MAX					#testing	
        print "redony le" 
@@ -91,14 +91,18 @@ while (datetime.datetime.now()):
 #	time.sleep(25)
 	if(datetime.datetime.now().strftime("%H:%M") == t_UP): 		
         	UP()
-		continue
+		#continue
 	 
 	#time to move shutter DOWN
 	if(datetime.datetime.now().strftime("%H:%M") == t_DOWN):
 		DOWN()
-		continue
-	
-	print datetime.datetime.now().strftime("%H:%M")
-	time.sleep(15)
-
+		#continue
+	try:
+		print datetime.datetime.now().strftime("%H:%M")
+		time.sleep(15)
+	except KeyboardInterrupt:
+		GPIO.output(SHUTTER_PIN_UP, 1)                      # relay works with inverse logic 0=OFF ; 1=ON
+    		GPIO.output(SHUTTER_PIN_DOWN, 1)                    # relay works with inverse logic 0=OFF ; 1=ON  
+    		GPIO.cleanup()
+		break
 print "Good bye!"
